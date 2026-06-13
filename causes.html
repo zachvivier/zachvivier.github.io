@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>document.documentElement.classList.add("js-fade")</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Causes — Zach Vivier</title>
@@ -84,6 +85,11 @@
         transition: color 0.2s ease;
       }
       .cause-link:hover { color: #D8D2C4; }
+      @media (prefers-reduced-motion: no-preference) {
+        html.js-fade body { opacity: 0; }
+        html.js-fade body.page-ready { opacity: 1; transition: opacity 0.45s ease; }
+        html.js-fade body.page-leaving { opacity: 0; transition: opacity 0.3s ease; }
+      }
     </style>
   </head>
   <body>
@@ -105,5 +111,38 @@
 
       <!-- Add more causes here -->
     </main>
+    <script>
+      (function () {
+        var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+        function ready() {
+          if (!document.body) return;
+          document.body.classList.remove("page-leaving");
+          document.body.classList.add("page-ready");
+        }
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", ready);
+        } else {
+          ready();
+        }
+        window.addEventListener("pageshow", function (e) {
+          if (e.persisted) ready();
+        });
+        if (reduce) return;
+        document.addEventListener("click", function (e) {
+          if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+          var a = e.target.closest ? e.target.closest("a[href]") : null;
+          if (!a || a.target === "_blank" || a.hasAttribute("download")) return;
+          var u;
+          try { u = new URL(a.href, location.href); } catch (x) { return; }
+          if (u.origin !== location.origin || u.href === location.href) return;
+          var h = a.getAttribute("href");
+          if (h && h.charAt(0) === "#") return;
+          e.preventDefault();
+          document.body.classList.remove("page-ready");
+          document.body.classList.add("page-leaving");
+          setTimeout(function () { window.location.href = u.href; }, 300);
+        });
+      })();
+    </script>
   </body>
 </html>
