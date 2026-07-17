@@ -65,9 +65,11 @@
       .tool-link span { display: block; font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 1.5; }
       @keyframes pulse { 50% { opacity: .35; transform: scale(.8); } }
       @media (min-width: 821px) {
-        .scanner-workspace { align-items: start; display: grid; gap: 72px; grid-template-columns: minmax(0, .82fr) minmax(420px, 1.18fr); }
+        .scanner-workspace { align-items: start; display: grid; gap: 44px 72px; grid-template-areas: 'form result' 'resources result'; grid-template-columns: minmax(0, .82fr) minmax(420px, 1.18fr); }
+        .scanner-workspace form { grid-area: form; }
         .scanner-workspace .result { margin-top: 0; }
-        .scanner-workspace .result[hidden] + .resources { margin-top: 0; }
+        .scanner-workspace .resources { grid-area: resources; }
+        .scanner-workspace .result { grid-area: result; }
       }
       @media (max-width: 520px) { main { padding: 64px 24px 96px; } .back { margin-bottom: 48px; } .url-row { flex-direction: column; } button { min-height: 47px; } .tool-links { grid-template-columns: 1fr; } }
       @media (prefers-reduced-motion: reduce) { .result, .stat { transform: none; transition: none; } .result.loading .eyebrow::before { animation: none; } }
@@ -95,25 +97,23 @@
           <div id="turnstile-widget" class="turnstile"></div>
           <p class="help">Only public HTTP and HTTPS links can be checked.</p>
         </form>
-        <div class="scanner-secondary">
-          <section id="result" class="result" aria-live="polite" hidden>
-            <div id="result-eyebrow" class="eyebrow"></div>
-            <h2 id="result-title"></h2>
-            <p id="result-message"></p>
-            <div id="stats" class="stats" hidden></div>
-            <div id="details" class="details" hidden></div>
-          </section>
-          <section class="resources" aria-labelledby="other-tools-heading">
-            <h2 id="other-tools-heading">More ways to investigate</h2>
-            <p>Use a separate service when you want a different kind of signal.</p>
-            <div class="tool-links">
-              <a class="tool-link" href="https://urlscan.io/" target="_blank" rel="noopener noreferrer"><strong>urlscan.io ↗</strong><span>Inspect a public web scan and its behavior.</span></a>
-              <a class="tool-link" href="https://securitytrails.com/" target="_blank" rel="noopener noreferrer"><strong>SecurityTrails ↗</strong><span>Explore a domain's DNS and infrastructure history.</span></a>
-              <a class="tool-link" href="https://www.browserling.com/" target="_blank" rel="noopener noreferrer"><strong>Browserling ↗</strong><span>Open a site in a remote browser session.</span></a>
-              <a class="tool-link" href="https://app.any.run/" target="_blank" rel="noopener noreferrer"><strong>ANY.RUN ↗</strong><span>Interactively analyze a link in an isolated sandbox.</span></a>
-            </div>
-          </section>
-        </div>
+        <section id="result" class="result" aria-live="polite" hidden>
+          <div id="result-eyebrow" class="eyebrow"></div>
+          <h2 id="result-title"></h2>
+          <p id="result-message"></p>
+          <div id="stats" class="stats" hidden></div>
+          <div id="details" class="details" hidden></div>
+        </section>
+        <section class="resources" aria-labelledby="other-tools-heading">
+          <h2 id="other-tools-heading">More ways to investigate</h2>
+          <p>Use a separate service when you want a different kind of signal.</p>
+          <div class="tool-links">
+            <a class="tool-link" href="https://urlscan.io/" target="_blank" rel="noopener noreferrer"><strong>urlscan.io ↗</strong><span>Inspect a public web scan and its behavior.</span></a>
+            <a class="tool-link" href="https://securitytrails.com/" target="_blank" rel="noopener noreferrer"><strong>SecurityTrails ↗</strong><span>Explore a domain's DNS and infrastructure history.</span></a>
+            <a class="tool-link" href="https://www.browserling.com/" target="_blank" rel="noopener noreferrer"><strong>Browserling ↗</strong><span>Open a site in a remote browser session.</span></a>
+            <a class="tool-link" href="https://app.any.run/" target="_blank" rel="noopener noreferrer"><strong>ANY.RUN ↗</strong><span>Interactively analyze a link in an isolated sandbox.</span></a>
+          </div>
+        </section>
       </div>
     </main>
     <script>
