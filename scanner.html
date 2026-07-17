@@ -21,6 +21,9 @@
       .rule { background: #2E2A22; height: 1px; margin-bottom: 40px; width: 32px; }
       .intro { margin-bottom: 28px; }
       .notice { background: #191711; border-left: 2px solid #6C624E; color: #A9A190; font-size: 14px; line-height: 1.65; margin-bottom: 32px; padding: 15px 17px; }
+      .notice p { margin: 0; }
+      .vt-callout { color: #D8D2C4; display: inline-block; font-family: Arial, Helvetica, sans-serif; font-size: 11px; letter-spacing: .12em; margin-top: 12px; text-decoration: none; text-transform: uppercase; transition: color .2s ease; }
+      .vt-callout:hover { color: #FFFDF5; }
       label { color: #D8D2C4; display: block; font-size: 13px; letter-spacing: .08em; margin-bottom: 9px; text-transform: uppercase; }
       .url-row { display: flex; gap: 10px; }
       input { background: #17150F; border: 1px solid #39342A; border-radius: 2px; color: #EDE8DF; flex: 1; font: inherit; font-size: 16px; min-width: 0; outline: none; padding: 13px 14px; transition: border-color .2s ease, box-shadow .2s ease; }
@@ -31,18 +34,30 @@
       button:disabled { cursor: wait; opacity: .65; }
       .help { color: #7A7060; font-size: 13px; line-height: 1.65; margin-top: 12px; }
       .turnstile { margin-top: 18px; min-height: 65px; }
-      .result { border-top: 1px solid #2E2A22; margin-top: 44px; padding-top: 28px; }
+      .result { border-top: 1px solid #2E2A22; margin-top: 44px; opacity: 0; padding-top: 28px; transform: translateY(14px); transition: opacity .42s ease, transform .42s ease; }
       .result[hidden] { display: none; }
+      .result.is-visible { opacity: 1; transform: translateY(0); }
       .eyebrow { color: #7A7060; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+      .result.loading .eyebrow::before { animation: pulse 1.25s ease-in-out infinite; background: #D5B675; border-radius: 50%; content: ''; display: inline-block; height: 7px; margin: 0 8px 1px 0; vertical-align: middle; width: 7px; }
       .result h2 { color: #EDE8DF; font-family: 'Fraunces', Georgia, serif; font-size: 27px; line-height: 1.25; margin: 5px 0 8px; }
       .result p { color: #A9A190; font-size: 15px; }
       .result.error h2 { color: #D38C7D; }
       .result.caution h2 { color: #D5B675; }
       .stats { display: grid; gap: 1px; grid-template-columns: repeat(2, 1fr); margin-top: 22px; overflow: hidden; }
-      .stat { background: #191711; padding: 13px 15px; }
+      .stat { background: #191711; opacity: 0; padding: 13px 15px; transform: translateY(8px); transition: opacity .32s ease var(--delay, 0ms), transform .32s ease var(--delay, 0ms); }
+      .result.is-visible .stat { opacity: 1; transform: translateY(0); }
       .stat span { color: #7A7060; display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
       .stat strong { color: #EDE8DF; display: block; font-family: 'Fraunces', Georgia, serif; font-size: 27px; line-height: 1.2; margin-top: 3px; }
+      .details { border-top: 1px solid #2E2A22; margin-top: 22px; padding-top: 18px; }
+      .details a { color: #D8D2C4; font-size: 13px; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
+      .details a:hover { color: #FFFDF5; }
+      .flagged { margin-top: 18px; }
+      .flagged h3 { color: #D5B675; font-size: 12px; font-weight: 400; letter-spacing: .1em; margin-bottom: 9px; text-transform: uppercase; }
+      .flagged li { color: #A9A190; font-size: 14px; list-style: none; padding: 4px 0; }
+      .flagged strong { color: #EDE8DF; font-weight: 500; }
+      @keyframes pulse { 50% { opacity: .35; transform: scale(.8); } }
       @media (max-width: 520px) { main { padding: 64px 24px 96px; } .back { margin-bottom: 48px; } .url-row { flex-direction: column; } button { min-height: 47px; } }
+      @media (prefers-reduced-motion: reduce) { .result, .stat { transform: none; transition: none; } .result.loading .eyebrow::before { animation: none; } }
       @media (prefers-reduced-motion: no-preference) { html.js-fade body { opacity: 0; } html.js-fade body.page-ready { opacity: 1; transition: opacity .45s ease; } html.js-fade body.page-leaving { opacity: 0; transition: opacity .3s ease; } }
     </style>
   </head>
@@ -53,7 +68,10 @@
       <p class="subtitle">A second opinion before you click</p>
       <div class="rule"></div>
       <p class="intro">Check a public web address against VirusTotal's security scanners. A clean result is useful context, not a guarantee that a link is safe.</p>
-      <aside class="notice">Links submitted here are sent to VirusTotal. Do not scan private, sensitive, one-time, or password-reset links.</aside>
+      <aside class="notice">
+        <p>Links submitted here are sent to VirusTotal. Do not scan private, sensitive, one-time, or password-reset links.</p>
+        <a class="vt-callout" href="https://www.virustotal.com/gui/home/search" target="_blank" rel="noopener noreferrer">Prefer a manual check? Open VirusTotal ↗</a>
+      </aside>
       <form id="scanner-form" novalidate>
         <label for="target-url">Web address</label>
         <div class="url-row">
@@ -68,6 +86,7 @@
         <h2 id="result-title"></h2>
         <p id="result-message"></p>
         <div id="stats" class="stats" hidden></div>
+        <div id="details" class="details" hidden></div>
       </section>
     </main>
     <script>
@@ -81,6 +100,7 @@
         var title = document.getElementById('result-title');
         var message = document.getElementById('result-message');
         var stats = document.getElementById('stats');
+        var details = document.getElementById('details');
         var turnstileToken = '';
         var turnstileWidgetId = null;
 
@@ -95,6 +115,7 @@
         };
 
         function showResult(kind, label, heading, detail, scanStats) {
+          var wasHidden = result.hidden;
           result.hidden = false;
           result.className = 'result ' + kind;
           eyebrow.textContent = label;
@@ -103,12 +124,54 @@
           stats.hidden = !scanStats;
           stats.innerHTML = '';
           if (scanStats) {
-            [['Malicious', scanStats.malicious || 0], ['Suspicious', scanStats.suspicious || 0], ['Harmless', scanStats.harmless || 0], ['Undetected', scanStats.undetected || 0]].forEach(function (item) {
+            [['Malicious', scanStats.malicious || 0], ['Suspicious', scanStats.suspicious || 0], ['Harmless', scanStats.harmless || 0], ['Undetected', scanStats.undetected || 0]].forEach(function (item, index) {
               var card = document.createElement('div');
               card.className = 'stat';
+              card.style.setProperty('--delay', (index * 70) + 'ms');
               card.innerHTML = '<span>' + item[0] + '</span><strong>' + item[1] + '</strong>';
               stats.appendChild(card);
             });
+          }
+          result.classList.remove('is-visible');
+          window.requestAnimationFrame(function () {
+            if (wasHidden) window.requestAnimationFrame(function () { result.classList.add('is-visible'); });
+            else result.classList.add('is-visible');
+          });
+        }
+
+        function renderDetails(analysis) {
+          details.innerHTML = '';
+          details.hidden = true;
+          if (!analysis) return;
+
+          if (analysis.reportUrl) {
+            var report = document.createElement('a');
+            report.href = analysis.reportUrl;
+            report.target = '_blank';
+            report.rel = 'noopener noreferrer';
+            report.textContent = 'Open full VirusTotal report ↗';
+            details.appendChild(report);
+            details.hidden = false;
+          }
+
+          if (analysis.detections && analysis.detections.length) {
+            var flagged = document.createElement('div');
+            flagged.className = 'flagged';
+            var heading = document.createElement('h3');
+            heading.textContent = 'Flagged engines';
+            var list = document.createElement('ul');
+            analysis.detections.forEach(function (detection) {
+              var item = document.createElement('li');
+              var engine = document.createElement('strong');
+              engine.textContent = detection.engine + ': ';
+              item.appendChild(engine);
+              item.appendChild(document.createTextNode(detection.result || detection.category));
+              list.appendChild(item);
+            });
+            flagged.appendChild(heading);
+            flagged.appendChild(list);
+            details.appendChild(flagged);
+            details.hidden = false;
           }
         }
 
@@ -124,8 +187,10 @@
         }
 
         async function pollAnalysis(id) {
-          for (var attempt = 0; attempt < 3; attempt += 1) {
-            await new Promise(function (resolve) { setTimeout(resolve, 20000); });
+          var delays = [5000, 15000, 20000];
+          for (var attempt = 0; attempt < delays.length; attempt += 1) {
+            showResult('loading', attempt === 0 ? 'Scanning' : 'Still scanning', 'Checking the link…', attempt === 0 ? 'The first result usually arrives within a few seconds.' : 'VirusTotal is finishing its checks.');
+            await new Promise(function (resolve) { setTimeout(resolve, delays[attempt]); });
             var response = await fetch(API_BASE + '/analysis/' + encodeURIComponent(id));
             var data = await readJson(response);
             if (data.status === 'completed') return data;
@@ -146,6 +211,7 @@
             return;
           }
           setLoading(true);
+          renderDetails();
           showResult('', 'Submitting', 'Checking the link…', 'VirusTotal may take a short moment to return a result.');
           try {
             var submit = await fetch(API_BASE + '/scan', {
@@ -162,7 +228,9 @@
             } else {
               showResult('', 'Scan complete', 'No detections reported.', 'This is not a guarantee of safety—still verify unexpected links before opening them.', scanStats);
             }
+            renderDetails(analysis);
           } catch (error) {
+            renderDetails();
             showResult('error', 'Unable to check link', 'The scan did not complete.', error.message || 'Please try again shortly.');
           } finally {
             turnstileToken = '';
