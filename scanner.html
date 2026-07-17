@@ -13,7 +13,7 @@
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
       html, body { background: #111009; color: #B8B09E; font-family: 'Lora', Georgia, serif; font-size: 17px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-      main { max-width: 640px; margin: 0 auto; padding: 96px 40px 120px; }
+      main { max-width: 1160px; margin: 0 auto; padding: 96px 48px 120px; }
       .back { display: inline-block; color: #7A7060; font-size: 13px; letter-spacing: .1em; margin-bottom: 64px; text-decoration: none; text-transform: uppercase; transition: color .2s ease; }
       .back:hover { color: #D8D2C4; }
       h1 { color: #EDE8DF; font-family: 'Fraunces', Georgia, serif; font-size: clamp(42px, 10vw, 52px); font-weight: 700; letter-spacing: -.5px; line-height: 1.08; margin-bottom: 12px; }
@@ -55,8 +55,21 @@
       .flagged h3 { color: #D5B675; font-size: 12px; font-weight: 400; letter-spacing: .1em; margin-bottom: 9px; text-transform: uppercase; }
       .flagged li { color: #A9A190; font-size: 14px; list-style: none; padding: 4px 0; }
       .flagged strong { color: #EDE8DF; font-weight: 500; }
+      .resources { border-top: 1px solid #2E2A22; margin-top: 44px; padding-top: 27px; }
+      .resources h2 { color: #D8D2C4; font-size: 12px; font-weight: 400; letter-spacing: .1em; margin: 0 0 7px; text-transform: uppercase; }
+      .resources > p { color: #7A7060; font-size: 14px; margin: 0 0 17px; }
+      .tool-links { display: grid; gap: 1px; grid-template-columns: repeat(2, 1fr); }
+      .tool-link { background: #191711; color: #A9A190; min-height: 104px; padding: 15px; text-decoration: none; transition: background-color .2s ease, color .2s ease; }
+      .tool-link:hover { background: #222018; color: #EDE8DF; }
+      .tool-link strong { color: #D8D2C4; display: block; font-family: 'Fraunces', Georgia, serif; font-size: 18px; font-weight: 600; margin-bottom: 7px; }
+      .tool-link span { display: block; font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 1.5; }
       @keyframes pulse { 50% { opacity: .35; transform: scale(.8); } }
-      @media (max-width: 520px) { main { padding: 64px 24px 96px; } .back { margin-bottom: 48px; } .url-row { flex-direction: column; } button { min-height: 47px; } }
+      @media (min-width: 821px) {
+        .scanner-workspace { align-items: start; display: grid; gap: 72px; grid-template-columns: minmax(0, .82fr) minmax(420px, 1.18fr); }
+        .scanner-workspace .result { margin-top: 0; }
+        .scanner-workspace .result[hidden] + .resources { margin-top: 0; }
+      }
+      @media (max-width: 520px) { main { padding: 64px 24px 96px; } .back { margin-bottom: 48px; } .url-row { flex-direction: column; } button { min-height: 47px; } .tool-links { grid-template-columns: 1fr; } }
       @media (prefers-reduced-motion: reduce) { .result, .stat { transform: none; transition: none; } .result.loading .eyebrow::before { animation: none; } }
       @media (prefers-reduced-motion: no-preference) { html.js-fade body { opacity: 0; } html.js-fade body.page-ready { opacity: 1; transition: opacity .45s ease; } html.js-fade body.page-leaving { opacity: 0; transition: opacity .3s ease; } }
     </style>
@@ -70,24 +83,38 @@
       <p class="intro">Check a public web address against VirusTotal's security scanners. A clean result is useful context, not a guarantee that a link is safe.</p>
       <aside class="notice">
         <p>Links submitted here are sent to VirusTotal. Do not scan private, sensitive, one-time, or password-reset links.</p>
-        <a class="vt-callout" href="https://www.virustotal.com/gui/home/search" target="_blank" rel="noopener noreferrer">Prefer a manual check? Open VirusTotal ↗</a>
+        <a class="vt-callout" href="https://www.virustotal.com/gui/home/search" target="_blank" rel="noopener noreferrer">Go to VirusTotal ↗</a>
       </aside>
-      <form id="scanner-form" novalidate>
-        <label for="target-url">Web address</label>
-        <div class="url-row">
-          <input id="target-url" name="url" type="url" inputmode="url" autocomplete="url" placeholder="https://example.com" required />
-          <button id="scan-button" type="submit">Check link</button>
+      <div class="scanner-workspace">
+        <form id="scanner-form" novalidate>
+          <label for="target-url">Web address</label>
+          <div class="url-row">
+            <input id="target-url" name="url" type="url" inputmode="url" autocomplete="url" placeholder="https://example.com" required />
+            <button id="scan-button" type="submit">Check link</button>
+          </div>
+          <div id="turnstile-widget" class="turnstile"></div>
+          <p class="help">Only public HTTP and HTTPS links can be checked.</p>
+        </form>
+        <div class="scanner-secondary">
+          <section id="result" class="result" aria-live="polite" hidden>
+            <div id="result-eyebrow" class="eyebrow"></div>
+            <h2 id="result-title"></h2>
+            <p id="result-message"></p>
+            <div id="stats" class="stats" hidden></div>
+            <div id="details" class="details" hidden></div>
+          </section>
+          <section class="resources" aria-labelledby="other-tools-heading">
+            <h2 id="other-tools-heading">More ways to investigate</h2>
+            <p>Use a separate service when you want a different kind of signal.</p>
+            <div class="tool-links">
+              <a class="tool-link" href="https://urlscan.io/" target="_blank" rel="noopener noreferrer"><strong>urlscan.io ↗</strong><span>Inspect a public web scan and its behavior.</span></a>
+              <a class="tool-link" href="https://securitytrails.com/" target="_blank" rel="noopener noreferrer"><strong>SecurityTrails ↗</strong><span>Explore a domain's DNS and infrastructure history.</span></a>
+              <a class="tool-link" href="https://www.browserling.com/" target="_blank" rel="noopener noreferrer"><strong>Browserling ↗</strong><span>Open a site in a remote browser session.</span></a>
+              <a class="tool-link" href="https://app.any.run/" target="_blank" rel="noopener noreferrer"><strong>ANY.RUN ↗</strong><span>Interactively analyze a link in an isolated sandbox.</span></a>
+            </div>
+          </section>
         </div>
-        <div id="turnstile-widget" class="turnstile"></div>
-        <p class="help">Only public HTTP and HTTPS links can be checked.</p>
-      </form>
-      <section id="result" class="result" aria-live="polite" hidden>
-        <div id="result-eyebrow" class="eyebrow"></div>
-        <h2 id="result-title"></h2>
-        <p id="result-message"></p>
-        <div id="stats" class="stats" hidden></div>
-        <div id="details" class="details" hidden></div>
-      </section>
+      </div>
     </main>
     <script>
       (function () {
