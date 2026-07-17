@@ -55,7 +55,8 @@
       .flagged h3 { color: #D5B675; font-size: 12px; font-weight: 400; letter-spacing: .1em; margin-bottom: 9px; text-transform: uppercase; }
       .flagged li { color: #A9A190; font-size: 14px; list-style: none; padding: 4px 0; }
       .flagged strong { color: #EDE8DF; font-weight: 500; }
-      .resources { border-top: 1px solid #2E2A22; margin-top: 44px; padding-top: 27px; }
+      .resources { border-top: 1px solid #2E2A22; margin-top: 44px; padding-top: 27px; transition: opacity .18s ease, transform .18s ease; }
+      .resources.is-moving { opacity: 0; transform: translateY(8px); }
       .resources h2 { color: #D8D2C4; font-size: 12px; font-weight: 400; letter-spacing: .1em; margin: 0 0 7px; text-transform: uppercase; }
       .resources > p { color: #7A7060; font-size: 14px; margin: 0 0 17px; }
       .tool-links { display: grid; gap: 1px; grid-template-columns: repeat(2, 1fr); }
@@ -65,14 +66,15 @@
       .tool-link span { display: block; font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 1.5; }
       @keyframes pulse { 50% { opacity: .35; transform: scale(.8); } }
       @media (min-width: 821px) {
-        .scanner-workspace { align-items: start; display: grid; gap: 44px 72px; grid-template-areas: 'form result' 'resources result'; grid-template-columns: minmax(0, .82fr) minmax(420px, 1.18fr); }
+        .scanner-workspace { align-items: start; display: grid; gap: 44px 72px; grid-template-areas: 'form result' 'form resources'; grid-template-columns: minmax(0, .82fr) minmax(420px, 1.18fr); }
+        .scanner-workspace.is-scanning { grid-template-areas: 'form result' 'resources result'; }
         .scanner-workspace form { grid-area: form; }
         .scanner-workspace .result { margin-top: 0; }
         .scanner-workspace .resources { grid-area: resources; }
         .scanner-workspace .result { grid-area: result; }
       }
       @media (max-width: 520px) { main { padding: 64px 24px 96px; } .back { margin-bottom: 48px; } .url-row { flex-direction: column; } button { min-height: 47px; } .tool-links { grid-template-columns: 1fr; } }
-      @media (prefers-reduced-motion: reduce) { .result, .stat { transform: none; transition: none; } .result.loading .eyebrow::before { animation: none; } }
+      @media (prefers-reduced-motion: reduce) { .result, .stat, .resources { transform: none; transition: none; } .result.loading .eyebrow::before { animation: none; } }
       @media (prefers-reduced-motion: no-preference) { html.js-fade body { opacity: 0; } html.js-fade body.page-ready { opacity: 1; transition: opacity .45s ease; } html.js-fade body.page-leaving { opacity: 0; transition: opacity .3s ease; } }
     </style>
   </head>
@@ -128,6 +130,8 @@
         var message = document.getElementById('result-message');
         var stats = document.getElementById('stats');
         var details = document.getElementById('details');
+        var workspace = document.querySelector('.scanner-workspace');
+        var resources = document.querySelector('.resources');
         var turnstileToken = '';
         var turnstileWidgetId = null;
 
@@ -207,6 +211,23 @@
           button.textContent = loading ? 'Checking…' : 'Check link';
         }
 
+        function moveResourcesForScan() {
+          if (workspace.classList.contains('is-scanning')) return;
+          if (!window.matchMedia('(min-width: 821px)').matches) {
+            workspace.classList.add('is-scanning');
+            return;
+          }
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            workspace.classList.add('is-scanning');
+            return;
+          }
+          resources.classList.add('is-moving');
+          window.setTimeout(function () {
+            workspace.classList.add('is-scanning');
+            window.requestAnimationFrame(function () { resources.classList.remove('is-moving'); });
+          }, 180);
+        }
+
         async function readJson(response) {
           var data = await response.json().catch(function () { return {}; });
           if (!response.ok) throw new Error(data.error || 'The scanner could not complete that request.');
@@ -238,6 +259,7 @@
             return;
           }
           setLoading(true);
+          moveResourcesForScan();
           renderDetails();
           showResult('', 'Submitting', 'Checking the link…', 'VirusTotal may take a short moment to return a result.');
           try {
