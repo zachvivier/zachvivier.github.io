@@ -66,12 +66,13 @@
       .tool-link span { display: block; font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 1.5; }
       @keyframes pulse { 50% { opacity: .35; transform: scale(.8); } }
       @media (min-width: 821px) {
-        .scanner-workspace { align-items: start; display: grid; gap: 44px 72px; grid-template-areas: 'form result' 'form resources'; grid-template-columns: minmax(0, .82fr) minmax(420px, 1.18fr); }
+        .scanner-workspace { align-items: start; display: grid; gap: 44px 72px; grid-template-areas: 'form resources' 'form result'; grid-template-columns: minmax(0, .82fr) minmax(420px, 1.18fr); }
         .scanner-workspace.is-scanning { grid-template-areas: 'form result' 'resources result'; }
         .scanner-workspace form { grid-area: form; }
         .scanner-workspace .result { margin-top: 0; }
         .scanner-workspace .resources { grid-area: resources; }
         .scanner-workspace .result { grid-area: result; }
+        .scanner-workspace:not(.is-scanning) .resources { border-top: 0; margin-top: 0; padding-top: 0; }
       }
       @media (max-width: 520px) { main { padding: 64px 24px 96px; } .back { margin-bottom: 48px; } .url-row { flex-direction: column; } button { min-height: 47px; } .tool-links { grid-template-columns: 1fr; } }
       @media (prefers-reduced-motion: reduce) { .result, .stat, .resources { transform: none; transition: none; } .result.loading .eyebrow::before { animation: none; } }
