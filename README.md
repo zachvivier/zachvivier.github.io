@@ -2,7 +2,7 @@
 
 Source for [zachvivier.com](https://zachvivier.com).
 
-This is a single static page served directly by GitHub Pages. It has no build step or external dependencies.
+A static personal site with a homepage, About page, article index, search, and individual articles. Served directly by GitHub Pages with no build step or external dependencies.
 
 ## Local preview
 
