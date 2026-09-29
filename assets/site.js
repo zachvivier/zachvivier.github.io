@@ -19,4 +19,24 @@
       document.querySelector('#search-status').textContent = count ? `${count} ${count === 1 ? 'result' : 'results'}` : 'No matches. Try “homelab”, “AI”, or “tools”.';
     });
   }
+  const faq = document.querySelector('[data-faq]');
+  const faqToggle = document.querySelector('[data-faq-toggle]');
+  if (faq && faqToggle) {
+    const items = [...faq.querySelectorAll('details')];
+    const sync = () => {
+      const allOpen = items.every(item => item.open);
+      const text = allOpen ? 'Collapse all questions' : 'Expand all questions';
+      faqToggle.setAttribute('aria-expanded', allOpen);
+      faqToggle.setAttribute('aria-label', text);
+      faqToggle.title = text;
+    };
+    faqToggle.addEventListener('click', () => {
+      const open = !items.every(item => item.open);
+      items.forEach(item => { item.open = open; });
+      sync();
+    });
+    faq.addEventListener('toggle', sync, true);
+    faqToggle.hidden = false;
+    sync();
+  }
 })();
