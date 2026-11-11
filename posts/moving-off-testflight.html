@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Zach Vivier — technical support, homelab projects, and learning by building."><title>Moving My Apps Off TestFlight · Zach Vivier</title><link rel="icon" href="../favicon.svg?v=3" type="image/svg+xml"><script>try{document.documentElement.dataset.theme=localStorage.getItem('zv-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch{}</script><link rel="preload" href="../assets/fonts/geist.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="../assets/site.css?v=d15255ae5d66"><script defer src="../assets/site.js?v=354f39823cd2"></script><script defer src="../assets/dots.js?v=5b9d19352008"></script></head>
+<body><a class="skip" href="#main">Skip to content</a><div class="dots-clip" aria-hidden="true"><canvas class="dots dots-a"></canvas><canvas class="dots dots-b"></canvas></div>
+<header><a class="logo" href="../index.html">zach vivier</a><nav class="tools" aria-label="Main navigation"><a class="pill" href="../posts.html" aria-current="page">Posts</a><a class="pill" href="../apps/">Apps</a><a class="pill" href="../about.html">About</a><a class="pill icon-btn" href="../search.html" aria-label="Search" title="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></a><button class="pill icon-btn" type="button" data-theme-toggle aria-label="Switch theme" title="Toggle light and dark theme"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></nav></header>
+<main id="main">
+<article class="page prose"><a class="breadcrumb" href="../posts.html">Posts / Moving My Apps Off TestFlight</a>
+<div class="article-content"><h1>Moving My Apps Off TestFlight</h1>
+<p><a class="tldr-link" href="#tldr" aria-label="Jump to the AI summary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 13V4a2 2 0 0 1 4 0v7"/><path d="M13 8a2 2 0 0 1 4 0v3"/><path d="M17 10a2 2 0 0 1 4 0v5a7 7 0 0 1-7 7h-1a5 5 0 0 1-3.6-1.5l-5.8-6a2 2 0 0 1 2.8-2.8L9 14"/></svg><span>tl;dr</span></a></p>
+
+<p>Over the last two months I built three iPhone apps with Claude: <a href="building-gamelog.html">Gamelog</a>, <a href="building-cozy-reader.html">Cozy Reader</a>, and <a href="building-cozy-crafter.html">Cozy Crafter</a>. Each one went to TestFlight, and I invited anyone to try them. This month I retired all three. They now run as web apps on the Framework desktop in my house.</p>
+<h2>Why I left</h2>
+<p>These apps have two users: my wife and me. To keep them on our phones, I needed an Apple Developer membership, which costs $99 a year. TestFlight builds also stop working after 90 days, so each app needed a new upload every few months, used or not. That is a lot of upkeep for two people.</p>
+<p>I had also started the App Store listing for Gamelog. The more of it I filled in, the less I wanted to run a public app.</p>
+<h2>What replaced them</h2>
+<p>Each app is now a web page and a small Python server. The server uses only what comes with Python, so there is nothing to install or update around it. It runs on my Framework and answers only on my Tailnet, the private network Tailscale makes between our devices. Nothing is open to the internet.</p>
+<p>On the iPhone, you open the page in Safari and choose Add to Home Screen. After that it has its own icon and opens full screen like any other app. It keeps a copy of the data on the phone, so it still opens when the phone is off the Tailnet. Changes wait and sync when the server is back in reach.</p>
+<p>Moving over was simple. The iPhone apps could already save a backup file, and the web apps read that same file. They can write it too, so there is a way back.</p>
+<h2>What got better</h2>
+<p>In the <a href="building-cozy-crafter.html">Cozy Crafter post</a> I said syncing between devices could come later. It came with the move. The server holds the data, so her phone and iPad show the same projects, themes included.</p>
+<p>Shipping a fix is faster too. I change a file on the Framework, and the fix is there the next time the app opens. There is no build to archive, no upload, and no review to wait for.</p>
+<p>I also don’t need a Mac anymore. The iPhone apps could only be built on one, in Xcode. The web apps live on the Framework, and I can work on them remotely from any of my other machines running Linux.</p>
+<h2>A bonus: my wife is on the Tailnet</h2>
+<p>To use her apps, my wife’s phone had to join my Tailnet. I set that up for Cozy Reader and Cozy Crafter, but it opened up everything else I run at home. We can now use other local apps together. The first is Filament Shelf, my inventory of the filament for our 3D printer. She can check what colors we have before she plans a print.</p>
+<h2>What I gave up</h2>
+<p>Nobody else can install them. A TestFlight link works for anyone, and an app on my Tailnet works for the people on my Tailnet.</p>
+<p>Some iPhone features are gone: widgets, Live Activities, Siri, and haptics. So far neither of us has missed them.</p>
+<p>I also said her data would stay on her phone, with no server. Now there is a server. It sits in our house and nobody else can reach it, so I think the promise still holds. But a backup is now my job, not iCloud’s.</p>
+<h2>If you want one</h2>
+<p>The betas are closed. If you would like to run one of these yourself, email <a href="mailto:zachvivierdev@gmail.com">zachvivierdev@gmail.com</a> and say which app. I can share the source on GitHub. You need a computer that stays on, and Tailscale.</p></div>
+<section aria-labelledby="tldr">
+<h2 id="tldr" tabindex="-1">tl;dr</h2>
+<p>Zach retired his three iPhone apps, Gamelog, Cozy Reader, and Cozy Crafter, and rebuilt them as web apps that run on his Framework desktop at home. They are reachable only over his Tailnet and are saved to the iPhone Home Screen. The move ends the yearly Apple Developer fee, adds sync between devices, makes fixes quick to ship, and removes the need for a Mac. It also put his wife on the Tailnet, so they can share other home apps, such as his 3D printer filament inventory. The cost is that nobody outside his Tailnet can install them, and a few iPhone-only features are gone. The TestFlight betas are closed, and he will share the source on request.</p>
+<p class="meta">Summarized by AI.</p>
+</section>
+<p><a href="../posts.html">Back to all posts</a></p></article>
+</main>
+<footer><span>Zach Vivier</span><nav aria-label="Footer"><a href="../about.html">About</a><a href="https://github.com/zachvivier">GitHub</a><a href="https://www.linkedin.com/in/zachvivier">LinkedIn</a></nav></footer>
+</body></html>
