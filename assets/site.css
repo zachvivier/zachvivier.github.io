@@ -38,7 +38,7 @@ button, input { font: inherit; }
 .skip { position: fixed; top: -100px; left: 16px; z-index: 20; padding: 10px 12px; border-radius: 7px; background: var(--fg); color: var(--bg); }
 .skip:focus { top: 8px; }
 
-/* Dot fields. dots.js draws them and keeps them off bare text. Decoration only.
+/* Dot fields. dots.js draws them and fades them behind bare text. Decoration only.
    The clip box stops the right field from widening the page on a phone. */
 .dots-clip { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
 .dots { position: absolute; pointer-events: none; }

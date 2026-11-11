@@ -15,7 +15,7 @@ Pages load `assets/site.css?v=<hash>`, where the hash is the first 12 characters
 
 The look follows Homelab Home: Geist fonts (`assets/fonts/`, OFL), neutral grays, tiles, pills, an island, and an animated dot field. The island is the floating pill with the latest post (class `notch`). Keep it floating: a notch joined to the top edge goes wrong on some devices. Every page repeats the same header, footer, and dot canvases; copy them from an existing page.
 
-- Dots must not sit behind bare text. `dots.js` clears them around every text node on its own. Text on an opaque panel is skipped: when you add a new kind of panel, add its selector to `PANELS` in `dots.js`.
+- Dots fade behind bare text, with no hard edge. `dots.js` does this for every text node on its own (`FADE` and `UNDER` set the distance and the strength). Text on an opaque panel is skipped: when you add a new kind of panel, add its selector to `PANELS` in `dots.js`.
 - The profile photos have the avatar tile color (`--muted`) baked in as their backdrop, one per theme.
 
 ## Adding a post
