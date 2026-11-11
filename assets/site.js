@@ -1,5 +1,5 @@
 (() => {
-  // Every post, newest first. The notch shows the first one and lists them all.
+  // Every post, newest first. The island at the top shows the first one and lists them all.
   // Add a new post here, and to index.html, posts.html, and search.html.
   const POSTS = [
     ['posts/moving-off-testflight.html', 'Moving My Apps Off TestFlight', 'Nov 11'],
@@ -42,7 +42,7 @@
     if (days > -1 && days < 7) time.append(Object.assign(document.createElement('span'), { className: 'tag new', textContent: 'New' }));
   }
 
-  // The notch.
+  // The island (class notch).
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; };
   const notch = el('div', 'notch');
   const inner = el('div', 'notch-inner');
