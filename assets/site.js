@@ -35,6 +35,13 @@
     });
   }
 
+  // Mark post tiles from the last 7 days as New. The pages are static, so this runs on each visit.
+  for (const time of document.querySelectorAll('.tile time[datetime]')) {
+    const days = (Date.now() - new Date(time.dateTime).getTime()) / 86400000;
+    // A post dated today can read as slightly in the future west of UTC, so allow a day's slack.
+    if (days > -1 && days < 7) time.append(Object.assign(document.createElement('span'), { className: 'tag new', textContent: 'New' }));
+  }
+
   // The notch.
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; };
   const notch = el('div', 'notch');
